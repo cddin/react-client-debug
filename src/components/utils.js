@@ -48,7 +48,7 @@ export const copyToClipboard = (textToCopy) => {
     var $tempInput = document.createElement("TEXTAREA");
     var t = document.createTextNode(textToCopy);
     $tempInput.appendChild(t);
-    var $body = document.getElementById("debugHelper");
+    var $body = document.getElementById("reactClientDebugMain");
     $body.appendChild($tempInput);
     $tempInput["select"]();
     document.execCommand("copy");
