@@ -1,70 +1,71 @@
-# Getting Started with Create React App
+# react-client-debug
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+react-client-debug is a react component that help developer to read web console log and network log from UI. In case developer have a limitation to access developer tools like chrome inspect.
 
-## Available Scripts
+Just tap the screen for 10 times. "plus" button will appear on the top left screen.
 
-In the project directory, you can run:
+Notes:
+Network log - for now only work with axios
 
-### `npm start`
+## Installation
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+Use the package manager (NPM) to install.
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+```bash
+npm react-client-debug
+```
 
-### `npm test`
+## Usage
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+```javascript
+import ReactClientDebug from "react-client-debug";
+```
 
-### `npm run build`
+and add at the root of application.
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+```html
+<div className="App">
+  <ReactClientDebug isDebug="{false}">
+    <header className="App-header">
+      <p>Hello World</p>
+    </header>
+  </ReactClientDebug>
+</div>
+```
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## Custom axios intercept
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+if you are create new instance of axios, react-client-debug unable to log the network. But there is option to do it manually.
 
-### `npm run eject`
+```javascript
+import { updateNetworkList } from "react-client-debug";
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+const xxx = axios.create();
+xxx.interceptors.request.use(function (config) {
+  // Do something before request is sent
+  return updateNetworkList(config);
+});
+// Add a response interceptor
+xxx.interceptors.response.use(
+  function (response) {
+    // Any status code that lie within the range of 2xx cause this function to trigger
+    // Do something with response data
+    updateNetworkList(response);
+    return response;
+  },
+  function (error) {
+    updateNetworkList(error);
+    // Any status codes that falls outside the range of 2xx cause this function to trigger
+    // Do something with response error
+    return Promise.reject(error);
+  }
+);
+```
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+## Developer info
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+[cddin80@gmail.com](mailto:cddin80@gmail.com)
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+## License
 
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+[ISC](https://opensource.org/licenses/ISC)

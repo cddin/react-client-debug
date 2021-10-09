@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react";
-import ReactJson from "react-json-view";
 import ConsoleLogUI from "./ConsoleLogUI";
+import ReactJson from "react-json-view";
 
 import {
   updateNetworkLog,
   copyToClipboard,
   interceptConsoleLog,
+  interceptAxois,
 } from "./utils";
 
 const CONSOLE = "console";
@@ -14,7 +15,7 @@ const ERROR = "error";
 let updateNetworkListInternal = null;
 
 function ReactClientDebug(props) {
-  const [isComponentReady, setIsComponentReady] = useState(false);
+  const [isDebugHelperReader, setIsDebugHelperReader] = useState(false);
   const [devMode, setDevMode] = useState(false);
   const [isMinimize, setMinimize] = useState(true);
   const [viewMode, setViewMode] = useState(CONSOLE);
@@ -35,7 +36,8 @@ function ReactClientDebug(props) {
       interceptConsoleLog(setConsoleLog);
     }
 
-    setIsComponentReady(true);
+    setIsDebugHelperReader(true);
+    interceptAxois(updateNetworkList);
   }, []);
 
   // ======================
@@ -63,7 +65,7 @@ function ReactClientDebug(props) {
       alert("Developer mode ON");
       interceptConsoleLog(setConsoleLog);
     } else {
-      setTimeoutVar(setTimeout(() => setTapCount(0), 3000));
+      setTimeoutVar(setTimeout(() => setTapCount(0), 250));
     }
   };
 
@@ -122,7 +124,7 @@ function ReactClientDebug(props) {
 
   function networkLogItemRender(networkItem) {
     let statusColor = "#999999";
-    const networkStatusCode = networkItem?.status ?? 0;
+    const networkStatusCode = networkItem.status ? networkItem.status : 0;
     if (networkStatusCode >= 200 && networkStatusCode < 300) {
       statusColor = "#32cd32";
     } else if (networkStatusCode >= 300) {
@@ -130,13 +132,13 @@ function ReactClientDebug(props) {
     }
 
     return (
-      <>
+      <div>
         <span>{networkItem.method}</span> [
         <span style={{ color: statusColor, fontWeight: "bold", fontSize: 12 }}>
-          {networkItem?.status ?? "pending"}
+          {networkItem.status ? networkItem.status : "pending"}
         </span>
         ] <span>{networkItem.url}</span>
-      </>
+      </div>
     );
   }
   // =====================
@@ -160,7 +162,7 @@ function ReactClientDebug(props) {
 
   const MaxMode = () => {
     return (
-      <>
+      <div>
         {viewObj && (
           <div
             style={{
@@ -249,24 +251,38 @@ function ReactClientDebug(props) {
             </div>
           </div>
         )}
-      </>
+      </div>
     );
   };
 
   const ErrorUI = () => {
     return (
       <div style={{ padding: "5px" }}>
-        <div>ErrorUI - coming soon</div>
+        <div>ErrorUI - coming soon</div>s
       </div>
     );
   };
 
-  if (!isComponentReady) {
-    return <></>;
+  if (!isDebugHelperReader) {
+    return <div></div>;
   }
 
   return (
-    <div id="reactClientDebugMain" onClick={onDeveloperModeHandler}>
+    <div
+      id="debugHelper"
+      onClick={onDeveloperModeHandler}
+      style={{
+        textAlign: "left",
+        fontSize: "11px",
+        position: "absolute",
+        top: "0",
+        bottom: "0",
+        left: "0",
+        right: "0",
+        color: "#000000",
+        letterSpacing: "0.5px",
+      }}
+    >
       {props.children}
       {isMinimize && devMode && <MinMode></MinMode>}
       {!isMinimize && devMode && <MaxMode></MaxMode>}

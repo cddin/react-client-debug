@@ -1,8 +1,16 @@
 import React from "react";
 
-function ConsoleLogUI({deleteAllLabel, consoleLog, onCopyConsoleLog, onConsoleLogItemDelete, onDeleteAllConsoleLog, consoleLogItemRender, onConsoleLogItemView}) {
+function ConsoleLogUI({
+  deleteAllLabel,
+  consoleLog,
+  onCopyConsoleLog,
+  onConsoleLogItemDelete,
+  onDeleteAllConsoleLog,
+  consoleLogItemRender,
+  onConsoleLogItemView,
+}) {
   return (
-    <>
+    <div>
       <div style={{ padding: "5px" }}>
         <button onClick={onDeleteAllConsoleLog}>{deleteAllLabel}</button>
       </div>
@@ -19,11 +27,19 @@ function ConsoleLogUI({deleteAllLabel, consoleLog, onCopyConsoleLog, onConsoleLo
             }}
           >
             <div>
-              <button onClick={() => onCopyConsoleLog(JSON.stringify(item))}>Copy</button>
-              <button style={{marginLeft:"5px"}} onClick={() => onConsoleLogItemDelete(index)}>
+              <button onClick={() => onCopyConsoleLog(JSON.stringify(item))}>
+                Copy
+              </button>
+              <button
+                style={{ marginLeft: "5px" }}
+                onClick={() => onConsoleLogItemDelete(index)}
+              >
                 delete
               </button>
-              <button  style={{marginLeft:"5px"}} onClick={() => onConsoleLogItemView(item)}>
+              <button
+                style={{ marginLeft: "5px" }}
+                onClick={() => onConsoleLogItemView(item)}
+              >
                 view
               </button>
             </div>
@@ -40,7 +56,7 @@ function ConsoleLogUI({deleteAllLabel, consoleLog, onCopyConsoleLog, onConsoleLo
           </div>
         ))}
       </div>
-    </>
+    </div>
   );
 }
 
