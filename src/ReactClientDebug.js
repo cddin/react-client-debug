@@ -6,7 +6,7 @@ import {
   updateNetworkLog,
   copyToClipboard,
   interceptConsoleLog,
-  interceptAxois,
+  interceptAxios,
 } from "./utils";
 
 const CONSOLE = "console";
@@ -37,7 +37,7 @@ function ReactClientDebug(props) {
     }
 
     setIsDebugHelperReader(true);
-    interceptAxois(updateNetworkList);
+    interceptAxios(props.axios, updateNetworkList);
   }, []);
 
   // ======================

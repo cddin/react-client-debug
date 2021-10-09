@@ -1,4 +1,3 @@
-import axios from "axios";
 export const updateNetworkLog = (val, setNetworkList) => {
   let newRecord = null;
   let updateRecord = null;
@@ -59,20 +58,18 @@ export const copyToClipboard = (textToCopy) => {
 };
 
 export const interceptConsoleLog = (setConsoleLog) => {
-  // const log = console.log.bind(console);
+  const log = console.log.bind(console);
   console.log = (...args) => {
     // log("DEBUG_HELPER:", ...args);
     setConsoleLog((prev) => [...prev, args]);
   };
 };
 
-export const interceptAxois = (updateNetworkList) => {
-  console.log(">>>interceptAxois>>>>");
+export const interceptAxios = (axios, updateNetworkList) => {
   // Add a request interceptor
   axios.interceptors.request.use(
     function (config) {
       // Do something before request is sent
-      console.log(">>>>>>>", config);
       return updateNetworkList(config);
     },
     function (error) {
@@ -86,7 +83,6 @@ export const interceptAxois = (updateNetworkList) => {
     function (response) {
       // Any status code that lie within the range of 2xx cause this function to trigger
       // Do something with response data
-      console.log("<<<<<<<", response);
       updateNetworkList(response);
       return response;
     },

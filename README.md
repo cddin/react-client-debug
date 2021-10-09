@@ -12,20 +12,21 @@ Network log - for now only work with axios
 Use the package manager (NPM) to install.
 
 ```bash
-npm react-client-debug
+npm install react-client-debug
 ```
 
 ## Usage
 
 ```javascript
 import ReactClientDebug from "react-client-debug";
+import axios from "axios";
 ```
 
 and add at the root of application.
 
 ```html
 <div className="App">
-  <ReactClientDebug isDebug="{false}">
+  <ReactClientDebug isDebug="{false}" axios="{axios}">
     <header className="App-header">
       <p>Hello World</p>
     </header>
