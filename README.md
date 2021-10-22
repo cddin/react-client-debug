@@ -26,7 +26,12 @@ and add at the root of application.
 
 ```html
 <div className="App">
-  <ReactClientDebug isDebug="{false}" axios="{axios}">
+  <ReactClientDebug
+    isEnabled="{true}"
+    axios="{axios}"
+    secKey="12345"
+    autoLogin="{true}"
+  >
     <header className="App-header">
       <p>Hello World</p>
     </header>

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import ConsoleLogUI from "./ConsoleLogUI";
+import PropTypes from "prop-types";
 import ReactJson from "react-json-view";
-
+import ConsoleLogUI from "./ConsoleLogUI";
 import {
   updateNetworkLog,
   copyToClipboard,
@@ -13,9 +13,21 @@ const CONSOLE = "console";
 const NETWORK = "network";
 const ERROR = "error";
 let updateNetworkListInternal = null;
+let tempSecKey = "";
+
+const styles = {
+  button: {
+    WebkitAppearance: "none",
+    MozAppearance: "none",
+    appearance: "none",
+    padding: "3px 6px",
+    border: "1px solid #999999",
+    backgroundColor: "rgb(240, 240, 240)",
+  },
+};
 
 function ReactClientDebug(props) {
-  const [isDebugHelperReader, setIsDebugHelperReader] = useState(false);
+  const [isEnabled, setIsEnabled] = useState(props?.isEnabled ?? true);
   const [devMode, setDevMode] = useState(false);
   const [isMinimize, setMinimize] = useState(true);
   const [viewMode, setViewMode] = useState(CONSOLE);
@@ -25,6 +37,8 @@ function ReactClientDebug(props) {
   const [tapCount, setTapCount] = useState(0);
   const [timeOutVar, setTimeoutVar] = useState(null);
   const [networkList, setNetworkList] = useState([]);
+
+  const [isLogin, setIsLogin] = useState(false);
 
   useEffect(() => {
     updateNetworkListInternal = (val) => {
@@ -36,15 +50,16 @@ function ReactClientDebug(props) {
       interceptConsoleLog(setConsoleLog);
     }
 
-    setIsDebugHelperReader(true);
     interceptAxios(props.axios, updateNetworkList);
+
+    checkIfLogin();
   }, []);
 
   // ======================
   // UI FUNCTION
   // ======================
   const onDeveloperModeHandler = () => {
-    if (props.isDisable) {
+    if (!isEnabled) {
       return;
     }
 
@@ -58,7 +73,6 @@ function ReactClientDebug(props) {
 
     setTapCount(tapCount + 1);
 
-    console.log("tapCount:", tapCount);
     if (tapCount === 10) {
       clearTimeout(timeOutVar);
       enableDevMode(true);
@@ -85,6 +99,8 @@ function ReactClientDebug(props) {
     setDevMode(val);
     if (!val) {
       setTapCount(0);
+      localStorage.removeItem("secKey");
+      setIsLogin(false);
     }
   };
 
@@ -122,6 +138,27 @@ function ReactClientDebug(props) {
     setViewObj(item);
   }
 
+  function checkIfLogin() {
+    // if secKey is not set, skip login
+    if (props?.secKey === "") {
+      setIsLogin(true);
+      return;
+    }
+    const lsSecKey = localStorage.getItem("secKey");
+    if (lsSecKey === props?.secKey && props?.autoLogin) {
+      setIsLogin(true);
+    }
+  }
+
+  function onPwEnter() {
+    if (tempSecKey === props?.secKey) {
+      setIsLogin(true);
+      if (props?.autoLogin) {
+        localStorage.setItem("secKey", props?.secKey ?? "");
+      }
+    }
+  }
+
   function networkLogItemRender(networkItem) {
     let statusColor = "#999999";
     const networkStatusCode = networkItem.status ? networkItem.status : 0;
@@ -155,7 +192,9 @@ function ReactClientDebug(props) {
           top: 0,
         }}
       >
-        <button onClick={onShowClick}>+</button>
+        <button style={styles.button} onClick={onShowClick}>
+          +
+        </button>
       </div>
     );
   };
@@ -176,7 +215,9 @@ function ReactClientDebug(props) {
               flexDirection: "column",
             }}
           >
-            <button onClick={() => setViewObj(null)}>close</button>
+            <button style={styles.button} onClick={() => setViewObj(null)}>
+              close
+            </button>
             <div style={{ width: "100%", height: "100%", overflow: "scroll" }}>
               <ReactJson src={viewObj} collapsed={true} />
             </div>
@@ -204,8 +245,12 @@ function ReactClientDebug(props) {
                 justifyContent: "space-between",
               }}
             >
-              <button onClick={onMinimizeClick}>-</button>
-              <button onClick={onDisableDevModeClick}>disable devmode</button>
+              <button style={styles.button} onClick={onMinimizeClick}>
+                -
+              </button>
+              <button style={styles.button} onClick={onDisableDevModeClick}>
+                disable devmode
+              </button>
               <select
                 name="viewMode"
                 id="viewMode"
@@ -263,8 +308,51 @@ function ReactClientDebug(props) {
     );
   };
 
-  if (!isDebugHelperReader) {
-    return <div></div>;
+  // show login ui
+  if (isEnabled && devMode && !isLogin) {
+    return (
+      <div
+        style={{
+          padding: "10px",
+          display: "flex",
+          height: "100%",
+          justifyContent: "center",
+          alignItems: "center",
+          position: "absolute",
+          top: "0",
+          bottom: "0",
+          left: "0",
+          right: "0",
+          margin: "auto",
+        }}
+      >
+        <form
+          style={{
+            border: "1px solid #cccccc",
+            backgroundColor: "aliceblue",
+            padding: "10px",
+            display: "flex",
+            flexDirection: "column",
+            gap: "10px",
+            fontSize: "12px",
+          }}
+        >
+          <label>
+            {"Enter key "}
+            <input
+              type="text"
+              onChange={(e) => {
+                tempSecKey = e.target.value;
+                onPwEnter();
+              }}
+            />
+          </label>
+          <button style={styles.button} onClick={() => enableDevMode(false)}>
+            cancel
+          </button>
+        </form>
+      </div>
+    );
   }
 
   return (
@@ -284,11 +372,42 @@ function ReactClientDebug(props) {
       }}
     >
       {props.children}
-      {isMinimize && devMode && <MinMode></MinMode>}
-      {!isMinimize && devMode && <MaxMode></MaxMode>}
+      {isMinimize && devMode && isEnabled && <MinMode></MinMode>}
+      {!isMinimize && devMode && isEnabled && <MaxMode></MaxMode>}
     </div>
   );
 }
+
+ReactClientDebug.propTypes = {
+  axios: PropTypes.object.isRequired,
+  isEnabled: PropTypes.bool,
+  autoLogin: PropTypes.bool,
+  secKey: PropTypes.string,
+  customArrayProp: PropTypes.arrayOf(function (
+    propValue,
+    key,
+    componentName,
+    location,
+    propFullName
+  ) {
+    if (!/matchme/.test(propValue[key])) {
+      return new Error(
+        "Invalid prop `" +
+          propFullName +
+          "` supplied to" +
+          " `" +
+          componentName +
+          "`. Validation failed."
+      );
+    }
+  }),
+};
+
+ReactClientDebug.defaultProps = {
+  isEnabled: true,
+  autoLogin: true,
+  secKey: "",
+};
 
 export default ReactClientDebug;
 

@@ -1,5 +1,16 @@
 import React from "react";
 
+const styles = {
+  button: {
+    WebkitAppearance: "none",
+    MozAppearance: "none",
+    appearance: "none",
+    padding: "3px 6px",
+    border: "1px solid #999999",
+    backgroundColor: "rgb(240, 240, 240)",
+  },
+};
+
 function ConsoleLogUI({
   deleteAllLabel,
   consoleLog,
@@ -12,7 +23,9 @@ function ConsoleLogUI({
   return (
     <div>
       <div style={{ padding: "5px" }}>
-        <button onClick={onDeleteAllConsoleLog}>{deleteAllLabel}</button>
+        <button style={styles.button} onClick={onDeleteAllConsoleLog}>
+          {deleteAllLabel}
+        </button>
       </div>
       <div style={{ display: "flex", flexDirection: "column" }}>
         {consoleLog.map((item, index) => (
@@ -27,17 +40,20 @@ function ConsoleLogUI({
             }}
           >
             <div>
-              <button onClick={() => onCopyConsoleLog(JSON.stringify(item))}>
+              <button
+                style={styles.button}
+                onClick={() => onCopyConsoleLog(JSON.stringify(item))}
+              >
                 Copy
               </button>
               <button
-                style={{ marginLeft: "5px" }}
+                style={{ ...styles.button, marginLeft: "5px" }}
                 onClick={() => onConsoleLogItemDelete(index)}
               >
                 delete
               </button>
               <button
-                style={{ marginLeft: "5px" }}
+                style={{ ...styles.button, marginLeft: "5px" }}
                 onClick={() => onConsoleLogItemView(item)}
               >
                 view

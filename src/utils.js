@@ -33,6 +33,7 @@ export const updateNetworkLog = (val, setNetworkList) => {
         if (item.uniqueId === updateRecord.config.uniqueId) {
           item.responeData = updateRecord.responeData;
           item.status = updateRecord.status;
+          delete item.uniqueId;
         }
 
         return item;
@@ -67,7 +68,7 @@ export const interceptConsoleLog = (setConsoleLog) => {
 
 export const interceptAxios = (axios, updateNetworkList) => {
   // Add a request interceptor
-  axios.interceptors.request.use(
+  axios?.interceptors?.request.use(
     function (config) {
       // Do something before request is sent
       return updateNetworkList(config);
@@ -79,7 +80,7 @@ export const interceptAxios = (axios, updateNetworkList) => {
   );
 
   // Add a response interceptor
-  axios.interceptors.response.use(
+  axios?.interceptors?.response.use(
     function (response) {
       // Any status code that lie within the range of 2xx cause this function to trigger
       // Do something with response data
