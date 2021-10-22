@@ -24,13 +24,13 @@ import axios from "axios";
 
 and add at the root of application.
 
-```html
+```javascript
 <div className="App">
   <ReactClientDebug
-    isEnabled="{true}"
-    axios="{axios}"
+    isEnabled={true}
+    axios={axios}
     secKey="12345"
-    autoLogin="{true}"
+    autoLogin={true}
   >
     <header className="App-header">
       <p>Hello World</p>
